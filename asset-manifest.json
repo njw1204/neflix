@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.js": "/neflix/static/js/main.d9b37b4a.js",
+    "static/js/787.86272f9d.chunk.js": "/neflix/static/js/787.86272f9d.chunk.js",
+    "index.html": "/neflix/index.html",
+    "main.d9b37b4a.js.map": "/neflix/static/js/main.d9b37b4a.js.map",
+    "787.86272f9d.chunk.js.map": "/neflix/static/js/787.86272f9d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.d9b37b4a.js"
+  ]
+}
