@@ -2,13 +2,25 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
+import { RecoilRoot } from "recoil";
+import { HelmetProvider } from "react-helmet-async";
 
+const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <RecoilRoot>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <App />
+          <ReactQueryDevtools />
+        </HelmetProvider>
+      </QueryClientProvider>
+    </RecoilRoot>
   </React.StrictMode>
 );
 
