@@ -13,6 +13,8 @@ export const theme: DefaultTheme = {
     darker: "#e5e5e5",
     lighter: "#f5f6fa",
   },
+  black: "#000000",
+  white: "#ffffff",
 };
 
 export const lightTheme: DefaultTheme = {
@@ -28,4 +30,6 @@ export const lightTheme: DefaultTheme = {
     darker: "#181818",
     lighter: "#141414",
   },
+  black: "#ffffff",
+  white: "#000000",
 };

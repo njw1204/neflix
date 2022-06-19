@@ -25,8 +25,9 @@ const Nav = styled(motion.nav)`
     `linear-gradient(to bottom, ${rgba(
       props.theme.darkColor.darkest,
       1
-    )} 10%, rgba(0, 0, 0, 0))`};
+    )} 5%, rgba(0, 0, 0, 0))`};
   background-size: 100% 100%;
+  z-index: 10;
 `;
 
 const Logo = styled(Link)`
@@ -40,7 +41,7 @@ const LogoIcon = styled(motion.svg)`
   fill: ${(props) => props.theme.accentColor};
 
   path {
-    stroke: ${(props) => props.theme.lightColor.darkest};
+    stroke: ${(props) => props.theme.accentColor};
     stroke-width: 4px;
   }
 `;
@@ -153,7 +154,7 @@ const navVariants: Variants = {
     },
   },
   scrolled: {
-    backgroundSize: "100% 1000%",
+    backgroundSize: "100% 2000%",
     transition: {
       duration: 0.1,
       ease: "easeIn",
@@ -166,7 +167,7 @@ const logoIconVariants: Variants = {
     fillOpacity: 1,
   },
   active: {
-    fillOpacity: [1, 0.2, 1],
+    fillOpacity: [1, 0, 1],
     transition: {
       duration: 1,
       repeat: Infinity,
@@ -284,22 +285,14 @@ function Header() {
       </Logo>
       <Menu>
         <MenuItem active={Boolean(homeMatch)}>
-          {homeMatch ? (
-            <span>
-              홈 <MenuIndicator layoutId="menuIndicator" />
-            </span>
-          ) : (
-            <Link to="/">홈</Link>
-          )}
+          <Link to="/">
+            홈 {homeMatch && <MenuIndicator layoutId="menuIndicator" />}
+          </Link>
         </MenuItem>
         <MenuItem active={Boolean(tvMatch)}>
-          {tvMatch ? (
-            <span>
-              시리즈 <MenuIndicator layoutId="menuIndicator" />
-            </span>
-          ) : (
-            <Link to="/tv">시리즈</Link>
-          )}
+          <Link to="/tv">
+            시리즈 {tvMatch && <MenuIndicator layoutId="menuIndicator" />}
+          </Link>
         </MenuItem>
       </Menu>
       <Search
