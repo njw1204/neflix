@@ -7,11 +7,12 @@ import {
 } from "framer-motion";
 import { darken, rgba, transparentize } from "polished";
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useMatch } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import styled, { DefaultTheme, useTheme } from "styled-components";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { useRecoilState } from "recoil";
 import { themeIdState } from "../stores/theme-mode";
+import { FieldErrors, useForm } from "react-hook-form";
 
 const Nav = styled(motion.nav)`
   position: fixed;
@@ -21,6 +22,7 @@ const Nav = styled(motion.nav)`
   width: 100%;
   height: 70px;
   overflow-x: auto;
+  overflow-y: hidden;
   background: ${(props) =>
     `linear-gradient(to bottom, ${rgba(
       props.theme.darkColor.darkest,
@@ -81,7 +83,7 @@ const MenuIndicator = styled(motion.div)`
   background-color: ${(props) => darken(0.1, props.theme.accentColor)};
 `;
 
-const Search = styled(motion.div)<{ open: boolean }>`
+const Search = styled(motion.form)<{ open: boolean }>`
   display: flex;
   align-items: center;
   flex: none;
@@ -137,7 +139,7 @@ const ThemeToggleButton = styled.div`
   }
 `;
 
-const ProfileIcon = styled.img`
+const ProfileIcon = styled(motion.img)`
   margin-left: 18px;
   width: 32px;
   height: 32px;
@@ -209,15 +211,34 @@ const searchInputVariants: Variants = {
   },
 };
 
+interface SearchForm {
+  keyword: string;
+}
+
 function Header() {
   const theme = useTheme();
-  const homeMatch = useMatch("/");
-  const tvMatch = useMatch("/tv");
+  const navigate = useNavigate();
+  const homeMatch =
+    [useMatch("/"), useMatch("/movie/:movieId")].find((match) => match) ?? null;
+  const tvMatch =
+    [useMatch("/tv"), useMatch("/tv/:tvId")].find((match) => match) ?? null;
   const { scrollY } = useViewportScroll();
   const navAnimation = useAnimation();
   const [themeId, setThemeId] = useRecoilState(themeIdState);
   const [searchOpen, setSearchOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const { register, handleSubmit } = useForm<SearchForm>({
+    defaultValues: {
+      keyword: "",
+    },
+  });
+  const { ref: keywordInputRegisterRef, ...keywordInputRegisterRest } =
+    register("keyword", {
+      required: true,
+      minLength: 2,
+      validate: (value) => Boolean(value.trim()),
+    });
+  const keywordInputRef = useRef<HTMLInputElement>();
+  const keywordInputAnimation = useAnimation();
 
   useEffect(() => {
     const callback = (transition?: Transition) => {
@@ -240,9 +261,9 @@ function Header() {
 
   useEffect(() => {
     if (searchOpen) {
-      searchInputRef.current?.focus();
+      keywordInputRef.current?.focus();
     } else {
-      searchInputRef.current?.blur();
+      keywordInputRef.current?.blur();
     }
   }, [searchOpen]);
 
@@ -266,6 +287,32 @@ function Header() {
     if (event.key === "Escape") {
       setSearchOpen(false);
     }
+  };
+
+  const onSubmitSearchForm = (data: SearchForm) => {
+    navigate(`/search?keyword=${encodeURIComponent(data.keyword)}`);
+  };
+
+  const onInvalidSearchForm = (errors: FieldErrors<SearchForm>) => {
+    const rotate = [];
+    const scale = [];
+
+    for (let i = 0; i < 15; i++) {
+      rotate.push(i % 2 === 0 ? 10 : -10);
+      scale.push(i % 3 === 0 ? 1.5 : 1.3);
+    }
+
+    rotate.push(0);
+    scale.push(1);
+
+    keywordInputAnimation.start({
+      rotate,
+      scale,
+      transition: {
+        type: "tween",
+        duration: 0.5,
+      },
+    });
   };
 
   return (
@@ -296,6 +343,7 @@ function Header() {
         </MenuItem>
       </Menu>
       <Search
+        onSubmit={handleSubmit(onSubmitSearchForm, onInvalidSearchForm)}
         open={searchOpen}
         variants={searchVariants}
         custom={{ theme }}
@@ -314,7 +362,11 @@ function Header() {
           />
         </SearchButton>
         <SearchInput
-          ref={searchInputRef}
+          {...keywordInputRegisterRest}
+          ref={(element) => {
+            keywordInputRegisterRef(element);
+            keywordInputRef.current = element ?? undefined;
+          }}
           onKeyDown={onKeyDownSearchInput}
           open={searchOpen}
           variants={searchInputVariants}
@@ -328,7 +380,11 @@ function Header() {
           <MdLightMode size={24} />
         )}
       </ThemeToggleButton>
-      <ProfileIcon src="https://i.imgur.com/bySkNvX.png" alt="Profile" />
+      <ProfileIcon
+        animate={keywordInputAnimation}
+        src="https://i.imgur.com/bySkNvX.png"
+        alt="Profile"
+      />
     </Nav>
   );
 }

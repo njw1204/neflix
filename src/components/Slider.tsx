@@ -8,9 +8,9 @@ import { MdOutlineNavigateBefore, MdOutlineNavigateNext } from "react-icons/md";
 const cardBoxShadow =
   "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
 
-const SliderContainer = styled.section`
+const SliderContainer = styled.section<{ titleExists: boolean }>`
   position: relative;
-  height: 215px;
+  height: ${(props) => (props.titleExists ? "215px" : "160px")};
 `;
 
 const SliderTitle = styled.h2`
@@ -124,7 +124,7 @@ const SliderNextButton = styled.div`
   z-index: 2;
 
   svg {
-    transition: transform 0.2s;
+    transition: transform 0.15s;
   }
 
   &:hover {
@@ -168,7 +168,7 @@ const sliderItemVariants: Variants = {
   },
   hover: {
     zIndex: 1,
-    scale: 1.5,
+    scale: 1.4,
     y: -50,
     boxShadow: cardBoxShadow,
     transition: {
@@ -198,15 +198,22 @@ const sliderItemInfoVariants: Variants = {
 };
 
 export interface SliderProps {
-  title: string;
+  id: string;
+  title?: string;
   data: Movie[];
   pageOffset: number;
+  onClick: (data: Movie, layoutId: string) => any;
 }
 
-function Slider({ title, data, pageOffset }: SliderProps) {
+function Slider({ id, title, data, pageOffset, onClick }: SliderProps) {
   const [sliderPage, setSliderPage] = useState(0);
   const [sliderMoving, setSliderMoving] = useState(false);
   const [sliderMovingPrev, setSliderMovingPrev] = useState(false);
+
+  let maxSliderPage = Math.ceil(data.length / pageOffset) - 1;
+  if (maxSliderPage > 1 && data.length % pageOffset !== 0) {
+    maxSliderPage -= 1;
+  }
 
   const onErrorSliderImage = (
     event: React.SyntheticEvent<HTMLImageElement>
@@ -217,12 +224,6 @@ function Slider({ title, data, pageOffset }: SliderProps) {
 
   const onClickSliderPrev = () => {
     if (!sliderMoving && data.length > 0) {
-      let maxSliderPage = Math.ceil(data.length / pageOffset) - 1;
-
-      if (maxSliderPage > 1 && data.length % pageOffset !== 0) {
-        maxSliderPage -= 1;
-      }
-
       setSliderMoving(true);
       setSliderMovingPrev(true);
       setSliderPage((prevSliderPage) =>
@@ -233,12 +234,6 @@ function Slider({ title, data, pageOffset }: SliderProps) {
 
   const onClickSliderNext = () => {
     if (!sliderMoving && data.length > 0) {
-      let maxSliderPage = Math.ceil(data.length / pageOffset) - 1;
-
-      if (maxSliderPage > 1 && data.length % pageOffset !== 0) {
-        maxSliderPage -= 1;
-      }
-
       setSliderMoving(true);
       setSliderMovingPrev(false);
       setSliderPage((prevSliderPage) =>
@@ -253,11 +248,13 @@ function Slider({ title, data, pageOffset }: SliderProps) {
   };
 
   return (
-    <SliderContainer>
+    <SliderContainer titleExists={Boolean(title)}>
       {title ? <SliderTitle>{title}</SliderTitle> : null}
-      <SliderPrevButton onClick={onClickSliderPrev}>
-        <MdOutlineNavigateBefore size={32} />
-      </SliderPrevButton>
+      {maxSliderPage > 1 ? (
+        <SliderPrevButton onClick={onClickSliderPrev}>
+          <MdOutlineNavigateBefore size={32} />
+        </SliderPrevButton>
+      ) : null}
       <AnimatePresence
         custom={{ prev: sliderMovingPrev }}
         initial={false}
@@ -273,60 +270,79 @@ function Slider({ title, data, pageOffset }: SliderProps) {
         >
           {data
             .slice(sliderPage * pageOffset, (sliderPage + 1) * pageOffset)
-            .map((movie) => (
-              <SliderItem
-                key={movie.id}
-                variants={sliderItemVariants}
-                initial="initial"
-                whileHover="hover"
-                transition={{
-                  default: {
-                    type: "tween",
-                    delay: 0,
-                    duration: 0.3,
-                  },
-                  zIndex: {
-                    type: "tween",
-                    delay: 0.3,
-                    duration: 0,
-                  },
-                }}
-              >
-                <SliderImageContainer>
-                  <SliderImage
-                    src={getImageFullUrl(movie.backdrop_path || "", "w500")}
-                    alt={movie.title}
-                    onError={onErrorSliderImage}
-                  />
-                </SliderImageContainer>
-                <SliderItemInfo
-                  variants={sliderItemInfoVariants}
+            .map((movie, index, arr) => {
+              const layoutId = id + movie.id;
+              const isFirst = index === 0;
+              const isLast = index === arr.length - 1;
+
+              return (
+                <SliderItem
+                  key={movie.id}
+                  layoutId={layoutId}
+                  onClick={() => onClick(movie, layoutId)}
+                  variants={sliderItemVariants}
+                  initial="initial"
+                  whileHover="hover"
                   transition={{
                     default: {
-                      type: "tween",
-                      delay: 0.3,
-                      duration: 0.3,
-                    },
-                    opacity: {
                       type: "tween",
                       delay: 0,
                       duration: 0.3,
                     },
+                    zIndex: {
+                      type: "tween",
+                      delay: 0.3,
+                      duration: 0,
+                    },
                   }}
+                  style={
+                    isFirst || isLast
+                      ? {
+                          originX: isFirst ? 0 : 1,
+                        }
+                      : undefined
+                  }
                 >
-                  <h2>{movie.title}</h2>
-                  <span>⭐ {movie.vote_average.toFixed(1)}</span>
-                  {movie.release_date ? (
-                    <div style={{ float: "right" }}>({movie.release_date})</div>
-                  ) : null}
-                </SliderItemInfo>
-              </SliderItem>
-            ))}
+                  <SliderImageContainer>
+                    <SliderImage
+                      src={getImageFullUrl(movie.backdrop_path || "", "w500")}
+                      alt={movie.title}
+                      onError={onErrorSliderImage}
+                    />
+                  </SliderImageContainer>
+                  <SliderItemInfo
+                    variants={sliderItemInfoVariants}
+                    transition={{
+                      default: {
+                        type: "tween",
+                        delay: 0.3,
+                        duration: 0.3,
+                      },
+                      opacity: {
+                        type: "tween",
+                        delay: 0,
+                        duration: 0.3,
+                      },
+                    }}
+                  >
+                    <h2>{movie.title}</h2>
+                    <span>⭐ {movie.vote_average.toFixed(1)}</span>
+                    {movie.release_date ? (
+                      <div style={{ float: "right" }}>
+                        ({movie.release_date})
+                      </div>
+                    ) : null}
+                  </SliderItemInfo>
+                </SliderItem>
+              );
+            })}
         </SliderRow>
       </AnimatePresence>
-      <SliderNextButton onClick={onClickSliderNext}>
-        <MdOutlineNavigateNext size={32} />
-      </SliderNextButton>
+      {maxSliderPage > 1 ? (
+        <SliderNextButton onClick={onClickSliderNext}>
+          <MdOutlineNavigateNext size={32} />
+        </SliderNextButton>
+      ) : null}
     </SliderContainer>
   );
 }

@@ -22,9 +22,16 @@ function App() {
         <BrowserRouter basename={process.env.PUBLIC_URL}>
           <Header />
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/tv" element={<Tv />} />
-            <Route path="/search" element={<Search />} />
+            <Route path="/" element={<Home />}>
+              <Route path="movie/:movieId" element={<div>Movie</div>} />
+            </Route>
+            <Route path="/tv" element={<Tv />}>
+              <Route path=":tvId" element={<div>Tv</div>} />
+            </Route>
+            <Route path="/search" element={<Search />}>
+              <Route path="movie/:id" element={<div>Search Movie</div>} />
+              <Route path="tv/:id" element={<div>Search Tv</div>} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </Container>

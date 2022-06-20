@@ -2,7 +2,7 @@ import { rgba, lighten } from "polished";
 import styled from "styled-components";
 import { getImageFullUrl, Movie } from "../apis/movie";
 
-const BannerContainer = styled.div<{ coverImage: string }>`
+const BannerContainer = styled.div<{ coverImage?: string }>`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -44,7 +44,7 @@ const BannerOverview = styled.div`
   font-weight: ${(props) => (props.theme.id === "light" ? "bold" : undefined)};
   text-shadow: 2px 2px 4px
     ${(props) => rgba(props.theme.darkColor.darkest, 0.7)};
-  overflow-y: scroll;
+  overflow-y: auto;
   transition: color 0.4s;
   cursor: pointer;
 
@@ -58,11 +58,13 @@ const BannerOverview = styled.div`
 
 export interface BannerProps {
   movie: Movie;
+  onClick?: (movie: Movie) => any;
 }
 
-function Banner({ movie }: BannerProps) {
+function Banner({ movie, onClick }: BannerProps) {
   return (
     <BannerContainer coverImage={getImageFullUrl(movie.backdrop_path || "")}>
+      <div style={{ height: 120 }} />
       <BannerTitle>{movie.title}</BannerTitle>
       <BannerOverview>{movie.overview}</BannerOverview>
     </BannerContainer>
