@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.js": "/neflix/static/js/main.4241dc4b.js",
+    "main.js": "/neflix/static/js/main.f0defc48.js",
     "static/js/787.86272f9d.chunk.js": "/neflix/static/js/787.86272f9d.chunk.js",
     "index.html": "/neflix/index.html",
-    "main.4241dc4b.js.map": "/neflix/static/js/main.4241dc4b.js.map",
+    "main.f0defc48.js.map": "/neflix/static/js/main.f0defc48.js.map",
     "787.86272f9d.chunk.js.map": "/neflix/static/js/787.86272f9d.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.4241dc4b.js"
+    "static/js/main.f0defc48.js"
   ]
 }
