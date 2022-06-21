@@ -9,7 +9,15 @@ import { themeSelector } from "./stores/theme-mode";
 import GlobalStyle from "./styles/global";
 
 const Container = styled.div`
-  margin-bottom: 10px;
+  min-height: 100vh;
+  margin-bottom: -70px;
+`;
+
+const StickyFooter = styled.div`
+  height: 70px;
+  color: ${(props) => props.theme.lightColor.darkest};
+  text-align: center;
+  font-size: 14px;
 `;
 
 function App() {
@@ -35,6 +43,11 @@ function App() {
           </Routes>
         </BrowserRouter>
       </Container>
+      <StickyFooter>
+        Copyright &copy; 2022 Na Jongwoo
+        <br />
+        This project is a front end clone of Netflix.
+      </StickyFooter>
     </ThemeProvider>
   );
 }

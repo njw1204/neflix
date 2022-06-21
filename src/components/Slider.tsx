@@ -4,6 +4,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { getImageFullUrl, Movie } from "../apis/movie";
 import { MdOutlineNavigateBefore, MdOutlineNavigateNext } from "react-icons/md";
+import { FALLBACK_IMAGE_URL } from "../enums/common-enum";
 
 const cardBoxShadow =
   "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
@@ -37,14 +38,6 @@ const SliderItem = styled(motion.article)`
   align-items: flex-start;
   border-radius: 6px;
   cursor: pointer;
-
-  &:first-child {
-    transform-origin: left center;
-  }
-
-  &:last-child {
-    transform-origin: right center;
-  }
 `;
 
 const SliderImageContainer = styled.div`
@@ -218,8 +211,7 @@ function Slider({ id, title, data, pageOffset, onClick }: SliderProps) {
   const onErrorSliderImage = (
     event: React.SyntheticEvent<HTMLImageElement>
   ) => {
-    event.currentTarget.src =
-      "https://via.placeholder.com/720x405.png?text=NO+IMAGE";
+    event.currentTarget.src = FALLBACK_IMAGE_URL;
   };
 
   const onClickSliderPrev = () => {
@@ -276,64 +268,64 @@ function Slider({ id, title, data, pageOffset, onClick }: SliderProps) {
               const isLast = index === arr.length - 1;
 
               return (
-                <SliderItem
-                  key={movie.id}
-                  layoutId={layoutId}
-                  onClick={() => onClick(movie, layoutId)}
-                  variants={sliderItemVariants}
-                  initial="initial"
-                  whileHover="hover"
-                  transition={{
-                    default: {
-                      type: "tween",
-                      delay: 0,
-                      duration: 0.3,
-                    },
-                    zIndex: {
-                      type: "tween",
-                      delay: 0.3,
-                      duration: 0,
-                    },
-                  }}
-                  style={
-                    isFirst || isLast
-                      ? {
-                          originX: isFirst ? 0 : 1,
-                        }
-                      : undefined
-                  }
-                >
-                  <SliderImageContainer>
-                    <SliderImage
-                      src={getImageFullUrl(movie.backdrop_path || "", "w500")}
-                      alt={movie.title}
-                      onError={onErrorSliderImage}
-                    />
-                  </SliderImageContainer>
-                  <SliderItemInfo
-                    variants={sliderItemInfoVariants}
+                <motion.div key={movie.id} layoutId={layoutId}>
+                  <SliderItem
+                    onClick={() => onClick(movie, layoutId)}
+                    variants={sliderItemVariants}
+                    initial="initial"
+                    whileHover="hover"
                     transition={{
                       default: {
-                        type: "tween",
-                        delay: 0.3,
-                        duration: 0.3,
-                      },
-                      opacity: {
                         type: "tween",
                         delay: 0,
                         duration: 0.3,
                       },
+                      zIndex: {
+                        type: "tween",
+                        delay: 0.3,
+                        duration: 0,
+                      },
                     }}
+                    style={
+                      isFirst || isLast
+                        ? {
+                            originX: isFirst ? 0 : 1,
+                          }
+                        : undefined
+                    }
                   >
-                    <h2>{movie.title}</h2>
-                    <span>⭐ {movie.vote_average.toFixed(1)}</span>
-                    {movie.release_date ? (
-                      <div style={{ float: "right" }}>
-                        ({movie.release_date})
-                      </div>
-                    ) : null}
-                  </SliderItemInfo>
-                </SliderItem>
+                    <SliderImageContainer>
+                      <SliderImage
+                        src={getImageFullUrl(movie.backdrop_path || "", "w780")}
+                        alt={movie.title}
+                        onError={onErrorSliderImage}
+                      />
+                    </SliderImageContainer>
+                    <SliderItemInfo
+                      variants={sliderItemInfoVariants}
+                      transition={{
+                        default: {
+                          type: "tween",
+                          delay: 0.3,
+                          duration: 0.3,
+                        },
+                        opacity: {
+                          type: "tween",
+                          delay: 0,
+                          duration: 0.3,
+                        },
+                      }}
+                    >
+                      <h2>{movie.title}</h2>
+                      <span>⭐ {movie.vote_average.toFixed(1)}</span>
+                      {movie.release_date ? (
+                        <div style={{ float: "right" }}>
+                          ({movie.release_date})
+                        </div>
+                      ) : null}
+                    </SliderItemInfo>
+                  </SliderItem>
+                </motion.div>
               );
             })}
         </SliderRow>

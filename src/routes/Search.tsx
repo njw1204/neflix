@@ -1,5 +1,10 @@
 import { useQuery } from "react-query";
-import { useMatch, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useMatch,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import styled from "styled-components";
 import {
   getMovieDetail,
@@ -42,8 +47,9 @@ interface SearchDetailRouteState {
 
 function Search() {
   const navigate = useNavigate();
-  // const location = useLocation() as { state: SearchDetailRouteState };
+  const location = useLocation() as { state: SearchDetailRouteState };
   // const locationStateSearch = location.state?.search ?? undefined;
+  const locationStateLayoutId = location.state?.layoutId ?? undefined;
   const [searchParams] = useSearchParams();
   const keyword = searchParams.get("keyword") ?? "";
   const searchMovieDetailRouteMatch = useMatch("/search/movie/:id");
@@ -149,6 +155,7 @@ function Search() {
               (searchMovieDetailRouteMatch ? movieDetail : tvDetail) ??
               undefined
             }
+            layoutId={locationStateLayoutId}
             show={
               Boolean(searchMovieDetailRouteMatch?.params.id) ||
               Boolean(searchTvDetailRouteMatch?.params.id)

@@ -1,6 +1,7 @@
-import { rgba, lighten } from "polished";
+import { rgba, darken } from "polished";
 import styled from "styled-components";
 import { getImageFullUrl, Movie } from "../apis/movie";
+import { useNavigate } from "react-router-dom";
 
 const BannerContainer = styled.div<{ coverImage?: string }>`
   display: flex;
@@ -28,13 +29,6 @@ const BannerTitle = styled.div`
     ${(props) => rgba(props.theme.darkColor.darkest, 0.7)};
   transition: color 0.4s;
   cursor: pointer;
-
-  &:hover {
-    color: ${(props) =>
-      props.theme.id === "light"
-        ? lighten(0.25, props.theme.lightColor.darkest)
-        : props.theme.lightColor.darkest};
-  }
 `;
 
 const BannerOverview = styled.div`
@@ -47,26 +41,47 @@ const BannerOverview = styled.div`
   overflow-y: auto;
   transition: color 0.4s;
   cursor: pointer;
+`;
+
+const DetailButton = styled.button.attrs({ type: "button" })`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+  padding: 10px 30px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  color: #000;
+  background-color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.4s;
+  cursor: pointer;
 
   &:hover {
-    color: ${(props) =>
-      props.theme.id === "light"
-        ? lighten(0.25, props.theme.lightColor.darkest)
-        : props.theme.lightColor.darkest};
+    background-color: ${(props) => darken(0.2, "#fff")};
   }
 `;
 
 export interface BannerProps {
   movie: Movie;
-  onClick?: (movie: Movie) => any;
 }
 
-function Banner({ movie, onClick }: BannerProps) {
+function Banner({ movie }: BannerProps) {
+  const navigate = useNavigate();
+
+  const navigateToDetail = () => {
+    navigate(`${movie.is_tv ? "/tv" : "/movie"}/${movie.id}`);
+  };
+
   return (
     <BannerContainer coverImage={getImageFullUrl(movie.backdrop_path || "")}>
       <div style={{ height: 120 }} />
-      <BannerTitle>{movie.title}</BannerTitle>
-      <BannerOverview>{movie.overview}</BannerOverview>
+      <BannerTitle onClick={navigateToDetail}>{movie.title}</BannerTitle>
+      <BannerOverview onClick={navigateToDetail}>
+        {movie.overview}
+        <DetailButton>자세히 보기</DetailButton>
+      </BannerOverview>
     </BannerContainer>
   );
 }

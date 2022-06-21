@@ -76,6 +76,7 @@ export interface MovieDetail {
   vote_average: number;
   vote_count: number;
   youtube_video_key?: string;
+  clips?: Clip[];
   is_tv?: boolean;
 }
 
@@ -108,15 +109,20 @@ interface TvDetail {
   vote_average: number;
   vote_count: number;
   youtube_video_key?: string;
+  clips?: Clip[];
+}
+
+interface Clip {
+  key: string;
+  site: string;
+  type: string;
+  name: string;
+  published_at: string;
 }
 
 interface MovieVideoSearchResult {
   id: number;
-  results?: {
-    key: string;
-    site: string;
-    type: string;
-  }[];
+  results?: Clip[];
 }
 
 export async function getNowPlayingMovies() {
@@ -259,6 +265,8 @@ export async function getMovieDetail(movieId: string) {
     `${API_BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}`
   ).then((response) => response.json());
 
+  movieDetail.clips = movieVideoSearchResult.results?.slice().reverse();
+
   const youtubeVideoKey = movieVideoSearchResult.results?.find(
     (video) =>
       video.site.toLowerCase() === "youtube" &&
@@ -284,6 +292,8 @@ export async function getTvDetail(tvId: string) {
   const tvVideoSearchResult: MovieVideoSearchResult = await fetch(
     `${API_BASE_URL}/tv/${tvId}/videos?api_key=${API_KEY}`
   ).then((response) => response.json());
+
+  tvDetail.clips = tvVideoSearchResult.results?.slice().reverse();
 
   const youtubeVideoKey = tvVideoSearchResult.results?.find(
     (video) =>
@@ -349,6 +359,7 @@ function convertTvDetailToMovieDetail(tvDetail: TvDetail): MovieDetail {
     vote_average: tvDetail.vote_average,
     vote_count: tvDetail.vote_count,
     youtube_video_key: tvDetail.youtube_video_key,
+    clips: tvDetail.clips,
     is_tv: true,
   };
 }
