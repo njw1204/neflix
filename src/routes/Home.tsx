@@ -14,6 +14,7 @@ import { useLocation, useMatch, useNavigate } from "react-router-dom";
 import VideoModal from "../components/VideoModal";
 import Wrapper from "../components/Wrapper";
 import { MainShowcaseContainer } from "../components/ShowcaseContainer";
+import { useCallback, useMemo } from "react";
 
 interface MovieDetailRouteState {
   movie?: Movie;
@@ -63,13 +64,20 @@ function Home() {
     isLoadingTopRatedMovies ||
     isLoadingUpcomingMovies ||
     false;
-  const featuredMovie = nowPlayingMoviesSearchResult?.results[0];
-  const nowPlayingMovies = nowPlayingMoviesSearchResult?.results.slice(1);
 
-  const navigateToMovieDetailRoute = (movie: Movie, layoutId: string) => {
-    const state: MovieDetailRouteState = { movie, layoutId };
-    navigate(`movie/${movie.id}`, { state });
-  };
+  const featuredMovie = nowPlayingMoviesSearchResult?.results[0];
+  const nowPlayingMovies = useMemo(
+    () => nowPlayingMoviesSearchResult?.results.slice(1),
+    [nowPlayingMoviesSearchResult?.results]
+  );
+
+  const navigateToMovieDetailRoute = useCallback(
+    (movie: Movie, layoutId: string) => {
+      const state: MovieDetailRouteState = { movie, layoutId };
+      navigate(`movie/${movie.id}`, { state });
+    },
+    [navigate]
+  );
 
   return (
     <Wrapper>

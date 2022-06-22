@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import { useQuery } from "react-query";
 import {
   useLocation,
@@ -85,19 +86,31 @@ function Search() {
     (Number(searchingMoviesSearchResult?.results.length) || 0) +
     (Number(searchingTvsSearchResult?.results.length) || 0);
 
-  const navigateToSearchDetailRoute = (search: Movie, layoutId: string) => {
-    const state: SearchDetailRouteState = { search, layoutId };
+  const movieChunks = useMemo(
+    () => chunkArrayInGroups(searchingMoviesSearchResult?.results ?? [], 6),
+    [searchingMoviesSearchResult?.results]
+  );
+  const tvChunks = useMemo(
+    () => chunkArrayInGroups(searchingTvsSearchResult?.results ?? [], 6),
+    [searchingTvsSearchResult?.results]
+  );
 
-    if (search.is_tv) {
-      navigate(`tv/${search.id}?keyword=${encodeURIComponent(keyword)}`, {
-        state,
-      });
-    } else {
-      navigate(`movie/${search.id}?keyword=${encodeURIComponent(keyword)}`, {
-        state,
-      });
-    }
-  };
+  const navigateToSearchDetailRoute = useCallback(
+    (search: Movie, layoutId: string) => {
+      const state: SearchDetailRouteState = { search, layoutId };
+
+      if (search.is_tv) {
+        navigate(`tv/${search.id}?keyword=${encodeURIComponent(keyword)}`, {
+          state,
+        });
+      } else {
+        navigate(`movie/${search.id}?keyword=${encodeURIComponent(keyword)}`, {
+          state,
+        });
+      }
+    },
+    [keyword, navigate]
+  );
 
   return (
     <Wrapper>
@@ -115,14 +128,11 @@ function Search() {
             {searchCount < 1 ? (
               <NoData>입력하신 검색어와 일치하는 결과가 없습니다. 😢</NoData>
             ) : null}
-            {Number(searchingMoviesSearchResult?.results.length)
-              ? chunkArrayInGroups(
-                  searchingMoviesSearchResult?.results ?? [],
-                  6
-                ).map((chunk, index) => (
+            {movieChunks.length
+              ? movieChunks.map((chunk, index) => (
                   <Slider
                     key={index}
-                    id="searchmovies"
+                    id={`searchmovies${index}`}
                     title={index === 0 ? "Movies" : undefined}
                     data={chunk}
                     pageOffset={6}
@@ -131,14 +141,11 @@ function Search() {
                 ))
               : null}
             <br />
-            {Number(searchingTvsSearchResult?.results.length)
-              ? chunkArrayInGroups(
-                  searchingTvsSearchResult?.results ?? [],
-                  6
-                ).map((chunk, index) => (
+            {tvChunks.length
+              ? tvChunks.map((chunk, index) => (
                   <Slider
                     key={index}
-                    id="searchseries"
+                    id={`searchseries${index}`}
                     title={index === 0 ? "Series" : undefined}
                     data={chunk}
                     pageOffset={6}

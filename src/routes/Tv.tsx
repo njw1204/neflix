@@ -14,6 +14,7 @@ import {
   getTvDetail,
   Movie,
 } from "../apis/movie";
+import { useCallback, useMemo } from "react";
 
 interface TvDetailRouteState {
   tv?: Movie;
@@ -60,12 +61,18 @@ function Tv() {
     isLoadingTopRatedTvs ||
     false;
   const featuredTv = onTheAirTvsSearchResult?.results[0];
-  const onTheAirTvs = onTheAirTvsSearchResult?.results.slice(1);
+  const onTheAirTvs = useMemo(
+    () => onTheAirTvsSearchResult?.results.slice(1),
+    [onTheAirTvsSearchResult?.results]
+  );
 
-  const navigateToTvDetailRoute = (tv: Movie, layoutId: string) => {
-    const state: TvDetailRouteState = { tv, layoutId };
-    navigate(`${tv.id}`, { state });
-  };
+  const navigateToTvDetailRoute = useCallback(
+    (tv: Movie, layoutId: string) => {
+      const state: TvDetailRouteState = { tv, layoutId };
+      navigate(`${tv.id}`, { state });
+    },
+    [navigate]
+  );
 
   return (
     <Wrapper>

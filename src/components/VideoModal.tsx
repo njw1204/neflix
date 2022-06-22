@@ -1,22 +1,17 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { darken, lighten, rgba } from "polished";
+import React from "react";
 import { MdClose, MdPlayArrow } from "react-icons/md";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import { getImageFullUrl, MovieDetail } from "../apis/movie";
 import { FALLBACK_IMAGE_URL } from "../enums/common-enum";
 import {
   getYoutubeThumbnailUrl,
   getYoutubeVideoUrl,
 } from "../utils/common-util";
+import Loader from "./Loader";
 
 const modalBoxShadow = "0 5px 15px rgba(0, 0, 0, 0.5)";
-
-const PreventScroll = createGlobalStyle`
-  html,
-  body {
-    overflow: hidden;
-  }
-`;
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -46,8 +41,7 @@ const ModalDialog = styled(motion.article)`
   margin: 40px auto;
   width: 960px;
   max-width: calc(100% - 40px);
-  min-height: 480px;
-  max-height: calc(100% - 80px);
+  height: calc(100% - 80px);
   border-radius: 8px;
   background-color: ${(props) => props.theme.darkColor.lighter};
   box-shadow: ${modalBoxShadow};
@@ -209,7 +203,6 @@ function VideoModal({ layoutId, data, show, onRequestClose }: VideoModalProps) {
       <AnimatePresence>
         {show ? (
           <>
-            <PreventScroll />
             <Overlay
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -228,6 +221,7 @@ function VideoModal({ layoutId, data, show, onRequestClose }: VideoModalProps) {
               tabIndex={-1}
             >
               <div style={{ minWidth: 480 }}>
+                {!data ? <Loader>Now Loading...</Loader> : null}
                 <VideoBackground
                   coverImage={
                     data
@@ -355,4 +349,4 @@ function VideoModal({ layoutId, data, show, onRequestClose }: VideoModalProps) {
   );
 }
 
-export default VideoModal;
+export default React.memo(VideoModal);

@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { getImageFullUrl, Movie } from "../apis/movie";
 import { MdOutlineNavigateBefore, MdOutlineNavigateNext } from "react-icons/md";
 import { FALLBACK_IMAGE_URL } from "../enums/common-enum";
+import React from "react";
 
 const cardBoxShadow =
   "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
@@ -339,4 +340,4 @@ function Slider({ id, title, data, pageOffset, onClick }: SliderProps) {
   );
 }
 
-export default Slider;
+export default React.memo(Slider);
