@@ -44,8 +44,6 @@ function App() {
         </BrowserRouter>
       </Container>
       <StickyFooter>
-        Copyright &copy; 2022 Na Jongwoo
-        <br />
         This project is a front end clone of Netflix.
       </StickyFooter>
     </ThemeProvider>
